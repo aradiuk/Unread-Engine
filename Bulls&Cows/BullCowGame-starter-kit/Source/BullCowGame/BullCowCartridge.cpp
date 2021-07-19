@@ -17,14 +17,12 @@ bool UBullCowCartridge::IsIsogram(const FString& guess)
     bool result = false;
 
     FString lower = guess.ToLower();
-    int pos = 0;
-    for (const auto& ch : lower) {
+    for (int pos = 0; pos < lower.Len(); ++pos) {
         int newPos = 0;
-        lower.FindLastChar(ch, newPos);
+        lower.FindLastChar(lower[pos], newPos);
         if (newPos != pos) {
             return false;
         }
-        ++pos;
     }
     return true;
 }
