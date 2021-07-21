@@ -2,15 +2,8 @@
 #include "BullCowCartridge.h"
 #include <iostream>
 
-void UBullCowCartridge::ResetGame()
-{
-    hiddenWord_ = TEXT("gun");
-    lives_ = hiddenWord_.Len();
-
-    PrintLine(TEXT("             Bulls & Cows game."));
-    PrintLine(TEXT("Hello there!\nLet us play a game."));
-    PrintLine(TEXT("\nTry to guess a %i letter word.\nYou have %i lives."), hiddenWord_.Len(), lives_);
-}
+const int32 minWordLength = 3;
+const int32 maxWordLength = 6;
 
 bool UBullCowCartridge::IsIsogram(const FString& guess)
 {
@@ -26,10 +19,49 @@ bool UBullCowCartridge::IsIsogram(const FString& guess)
     }
     return true;
 }
+BullCowCount UBullCowCartridge::GetBullCows(const FString& word) const
+{
+    int32 tmp = 0;
+    BullCowCount count;
+    for (int32 i = 0; i < word.Len(); ++i) {
+        if (word[i] == hiddenWord_[i]) {
+            ++count.bulls;
+        } else if (hiddenWord_.FindChar(word[i], tmp)) {
+            ++count.cows;
+        }
+    }
+}
+
+void UBullCowCartridge::ResetGame()
+{
+    int32 randomNum = FMath::RandRange(0, availableWords_.Num() - 1);
+    hiddenWord_ = availableWords_[randomNum];
+    lives_ = hiddenWord_.Len() * 2;
+
+    PrintLine(TEXT("             Bulls & Cows game."));
+    PrintLine(TEXT("Hello there!\nLet us play a game."));
+    PrintLine(TEXT("\nTry to guess a %i letter word.\nYou have %i lives."), hiddenWord_.Len(), lives_);
+}
+
+void UBullCowCartridge::FillHiddenWordsArray()
+{
+    TArray<FString> words;
+    const FString wordListPath = FPaths::ProjectContentDir() / TEXT("WordLists/HiddenWordList.txt");
+    FFileHelper::LoadFileToStringArrayWithPredicate(availableWords_, *wordListPath, [](const FString& word) {
+        int32 length = word.Len();
+        if (length >= minWordLength && length <= maxWordLength && IsIsogram(word)) {
+            return true;
+        }
+        return false;
+    });
+}
 
 void UBullCowCartridge::BeginPlay() // When the game starts
 {
     Super::BeginPlay();
+
+    FillHiddenWordsArray();
+
     ResetGame();
 }
 
@@ -54,6 +86,9 @@ void UBullCowCartridge::ProcessGuess(const FString& guess)
             gameOver_ = true;
         } else {
             PrintLine(TEXT("Wrong! You have lost a life! %i %s left"), lives_, (lives_ > 1 ? TEXT("lives") : TEXT("life")));
+
+            BullCowCount bullCowCount = GetBullCows(guess);
+            PrintLine(TEXT("Here are the bulls (%i)  and cows (%i) you've guessed."), bullCowCount.bulls, bullCowCount.cows);
         }
     }
 }
