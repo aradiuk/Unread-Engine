@@ -45,7 +45,7 @@ private:
 	void Backspace();
 	FString GetKeyString(FKey Key) const;
 	void UpdateText();
-
+	void PrintStats();
 
 	UPROPERTY(EditAnywhere)
 	int32 MaxLines = 10;

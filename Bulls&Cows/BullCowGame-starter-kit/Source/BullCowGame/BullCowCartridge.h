@@ -11,6 +11,11 @@ struct BullCowCount {
 	int32 cows = 0;
 };
 
+struct StoredGuess {
+	FString guess;
+	BullCowCount count;
+};
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class BULLCOWGAME_API UBullCowCartridge : public UCartridge
 {
@@ -27,9 +32,14 @@ class BULLCOWGAME_API UBullCowCartridge : public UCartridge
 		void ProcessGuess(const FString& guess);
 		void FillHiddenWordsArray();
 		BullCowCount GetBullCows(const FString& word) const;
+		void PrintStats() override;
+		void GetMinAndMaxLength(int32 difficulty);
+		void SetHiddenWord();
 
 		FString hiddenWord_;
 		int32 lives_;
 		bool gameOver_ = false;
 		TArray<FString> availableWords_;
+		TArray<StoredGuess> previousGuesses_;
+		int32 difficulty_ = -1;
 };

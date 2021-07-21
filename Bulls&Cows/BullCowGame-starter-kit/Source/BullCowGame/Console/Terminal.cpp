@@ -117,6 +117,11 @@ void UTerminal::OnKeyDown(FKey Key)
 		Backspace();
 	}
 
+	if (Key == EKeys::LeftControl)
+	{
+		PrintStats();
+	}
+
     const FString KeyString = GetKeyString(Key);
     const FModifierKeysState KeyState = FSlateApplication::Get().GetModifierKeys();
 	if (KeyState.IsShiftDown() || KeyState.AreCapsLocked())
@@ -169,4 +174,13 @@ FString UTerminal::GetKeyString(FKey Key) const
 void UTerminal::UpdateText()
 {
 	TextUpdated.Broadcast(GetScreenText());
+}
+
+void UTerminal::PrintStats()
+{
+	auto Cartridge = GetOwner()->FindComponentByClass<UCartridge>();
+	if (Cartridge != nullptr)
+	{
+		Cartridge->PrintStats();
+	}
 }

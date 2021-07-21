@@ -13,6 +13,7 @@ class BULLCOWGAME_API UCartridge : public UActorComponent
 	GENERATED_BODY()
 public:
 	virtual void OnInput(const FString& Input) PURE_VIRTUAL(UCartridge::OnInput,);
+	virtual void PrintStats() PURE_VIRTUAL(UCartridge::PrintStats,);
 protected:
 	void BeginPlay() override;
 
