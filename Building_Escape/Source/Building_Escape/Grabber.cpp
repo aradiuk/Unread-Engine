@@ -51,9 +51,15 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (physicsHandle_->GrabbedComponent) {
+		FVector playerLocation;
+		FRotator playerRotation;
+		GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(playerLocation, playerRotation);
 
-	// DrawDebugLine(GetWorld(), playerLocation, lineTraceEnd, FColor(255, 0, 0), false, 0.f, 0, 5.f);
-	GetFirstPhysicsBodyInReach();
+		FVector lineTraceEnd = playerLocation + playerRotation.Vector() * grabReachMultiplier_;
+
+		physicsHandle_->SetTargetLocation(lineTraceEnd);
+	}
 }
 
 FHitResult UGrabber::GetFirstPhysicsBodyInReach() const
@@ -83,9 +89,23 @@ FHitResult UGrabber::GetFirstPhysicsBodyInReach() const
 void UGrabber::Grab()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Function 'Grab' was called by pressing a button."));
+	FHitResult hitResult = GetFirstPhysicsBodyInReach();
+
+	if (physicsHandle_ && hitResult.GetActor()) {
+		FVector playerLocation;
+		FRotator playerRotation;
+		GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(playerLocation, playerRotation);
+
+		FVector lineTraceEnd = playerLocation + playerRotation.Vector() * grabReachMultiplier_;
+
+		physicsHandle_->GrabComponentAtLocation(hitResult.GetComponent(), NAME_None, lineTraceEnd);
+	}
 }
 
 void UGrabber::Release()
 {
+	if (physicsHandle_ && physicsHandle_->GrabbedComponent) {
+		physicsHandle_->ReleaseComponent();
+	}
 	UE_LOG(LogTemp, Warning, TEXT("Function 'Release' was called by releasing a button."));
 }
