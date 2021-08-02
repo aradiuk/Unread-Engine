@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/AudioComponent.h"
 #include "Engine/TriggerVolume.h"
 #include "OpenDoor.generated.h"
 
@@ -29,12 +30,15 @@ public:
 private:
 	void OpenDoor(float DeltaTime);
 	void CloseDoor(float DeltaTime);
-	void RotateDoor(float DeltaTime, float yaw);
+	void RotateDoor(float DeltaTime, float yaw, bool toPlaySound);
+	float TotalMassOnPressurePlate() const;
 
 private:
 	float initialYaw_ = 0.f;
 	float currentYaw_= 0.f;
 	float doorLastOpenedTime_ = 0.f;
+	bool triggerDoorOpenSound_ = true;
+	bool triggerDoorCloseSound_ = false;
 
 	UPROPERTY(EditAnywhere)
 	float openYaw_ = -90.f;
@@ -46,8 +50,11 @@ private:
 	float doorSpeedMultiplier_ = 2.f;
 
 	UPROPERTY(EditAnywhere)
-	ATriggerVolume* pressurePlate_;
+	ATriggerVolume* pressurePlate_ = nullptr;
 
 	UPROPERTY(EditAnywhere)
-	AActor* thePressor_; // The one that presses.
+	float massToPressThePlate_ = 50.f;
+
+	UPROPERTY()
+	UAudioComponent* audioComponent_ = nullptr;
 };

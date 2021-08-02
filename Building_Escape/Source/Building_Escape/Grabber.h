@@ -23,9 +23,12 @@ protected:
 
 private:
 	UPROPERTY(EditAnywhere)
-	float grabReachMultiplier_ = 100;
+	float grabReachMultiplier_ = 150;
 
+	UPROPERTY()
 	UPhysicsHandleComponent* physicsHandle_ = nullptr;
+
+	UPROPERTY()
 	UInputComponent* inputComponent_ = nullptr;
 
 	void Grab();
@@ -34,4 +37,6 @@ private:
 	void SetupInputComponent();
 
 	FHitResult GetFirstPhysicsBodyInReach() const;
+	FVector GetPlayerGrabLocation() const;
+	FVector GetPlayerLocation() const;
 };
